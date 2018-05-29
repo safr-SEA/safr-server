@@ -1,11 +1,10 @@
 'use strict';
-// REVIEW: Check out all of our new arrow function syntax!
 
 const pg = require('pg');
 const fs = require('fs');
 const cors = require('cors');
 const express = require('express');
-const superagent = ('superagent');
+const superagent = require('superagent');
 const conString = '';
 
 const app = express();
@@ -47,162 +46,73 @@ app.get('data/crimeData.json', (request, response)=> {
 
 
 
+const API_KEY = process.env.SOCRATA_KEY;
 
+const client = new pg.Client('postgres://localhost:5432/safr');
+client.connect();
+
+app.use(cors());
+app.use(express.urlencoded({extended:true}));
+// app.use(express.json());
+
+app.get('/', (req, res) => res.send(`It's ALLLLIIIIVEEE!!`));
+
+loadDB();
+
+app.get('/data/sea-gov', (req, res) => {
+    superagent
+    .get('https://data.seattle.gov/resource/y7pv-r3kh.json')
+        .query({
+            '$where': "(offense_code like '12%' or offense_code like '13%' or offense_code like '16%' or offense_code like '21%') and date_reported > '2018-02-01T12:00:00'",
+            '$$app_token': `${API_KEY}`
+				})
+        .then(response => {
+					response.body.forEach((e) => {
+						let SQL = 'INSERT INTO crime_reports(offense_code, summarized_offense_description, date_reported, hundred_block_location, district_sector, zone_beat, longitude, latitude, location) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT DO NOTHING';
+						let values = [e.offense_code, e.summarized_offense_description, e.date_reported, e.hundred_block_location, e.district_sector, e.zone_beat, e.longitude, e.latitude, e.location];
+						client.query(SQL, values)
+							.catch(console.error);
+					})
+					res.send(response.body);
+				})
+        .catch(console.error);
+});
+
+function loadDB() {
+		console.log('loadDB');
+    client.query(`
+    CREATE TABLE IF NOT EXISTS
+    crime_reports (
+      report_id SERIAL PRIMARY KEY,      
+      offense_code VARCHAR(10),      
+			summarized_offense_description VARCHAR(50),
+			date_reported TIMESTAMPTZ,      
+      hundred_block_location VARCHAR(50),
+      district_sector VARCHAR(5),
+      zone_beat VARCHAR(5),			
+			longitude DOUBLE PRECISION,
+      latitude DOUBLE PRECISION,
+      location VARCHAR(100)			
+    );`
+    )
+    .then(console.log)
+    .catch(console.error);
+}
 
 app.get('*', (request, response) => response.redirect(CLIENT_URL));
 
 
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
 
-// export PORT=3000
-// export CLIENT_URL=http://localhost:8080
-// export TOKEN=1234 # Please make your own PIN
-// export GOOGLE_API_KEY=your google books api key
-// Mac:     export DATABASE_URL=postgres://localhost:5432/books_app
-// Windows: export DATABASE_URL=postgres://USER:PASSWORD@localhost:5432/books_app
 
-
-
-
-
-//////// ** DATABASE LOADERS ** ////////
-////////////////////////////////////////
-
-function loadReports() {
-  let SQL = 'SELECT COUNT(*) FROM crime_reports';
-  client.query( SQL )
-  .then(result => {
-    if(!parseInt(result.rows[0].count)) {
-      fs.readFile('https://data.seattle.gov/resource/y7pv-r3kh.json', 'utf8', (err, fd) => {
-        JSON.parse(fd).forEach(element => {
-                          let SQL = `
-              INSERT INTO crime_reports (
-                report_id,
-                rms_cdw_id,
-                general_offense_number,
-                offense_code,
-                offense_code_extension,
-                offense_type,
-                summary_offense_code,
-                summarized_offense_description,
-                date_reported,
-                occurred_date_or_date_range_start,
-                occurred_date_range_end,
-                hundred_block_location,
-                district_sector,
-                zone_beat,
-                census_tract_2000,
-                longitude,
-                latitude,
-                location,
-                month,
-                year)
-              VALUES (default, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19);`;
-            let values = [
-              element.rms_cdw_id,
-              element.general_offense_number,
-              element.offense_code,
-              element.offense_code_extension,
-              element.offense_type,
-              element.summary_offense_code, element.summarized_offense_description, element.date_reported, element.occurred_date_or_date_range_start, element.occurred_date_range_end, element.hundred_block_location,
-              element.district_sector,
-              element.zone_beat,
-              element.census_tract_2000,
-              element.longitude,
-              element.latitude,
-              element.location,
-              element.month,
-              element.year];
-            client.query( SQL, values )
-              .catch(console.error);
-          })
-        })
-      }
-    })
-}
-
-function loadCrimeDB() {
-    //LOOK UP FLOATING TIMESTAMP
-
-  client.query(`
-    CREATE TABLE IF NOT EXISTS
-    crime_reports (
-      report_id SERIAL PRIMARY KEY,
-      rms_cdw_id VARCHAR(30),
-      general_offense_number VARCHAR(30),
-      offense_code VARCHAR(10),
-      offense_code_extension VARCHAR(5),
-      offense_type VARCHAR(50),
-      summary_offense_code VARCHAR(10),
-      summarized_offense_description VARCHAR(50),
-      date_reported DATETIME(YYYY-MM-DD[ hh:mm:ss[.mmm]]),
-      occurred_date_or_date_range_start DATETIME(YYYY-MM-DD[ hh:mm:ss[.mmm]]),
-      occurred_date_range_end DATETIME(YYYY-MM-DD[ hh:mm:ss[.mmm]]),
-      hundred_block_location VARCHAR(50),
-      district_sector VARCHAR(5),
-      zone_beat VARCHAR(5),
-      census_tract_2000 VARCHAR(15),
-      longitude DOUBLE,
-      latitude DOUBLE,
-      location VARCHAR(100),
-      month INTEGER,
-      year INTEGER
-    );`
-  )
-  //create new loadReports FUNCTION
-    .then(loadReports)
-    .catch(console.error);
-}
-
-// function loadReports() {
-              //   let SQL = 'SELECT COUNT(*) FROM crime_reports';
-              //   client.query( SQL )
-              //     .then(result => {
-              //       if(!parseInt(result.rows[0].count)) {
-              //         fs.readFile('https://data.seattle.gov/resource/y7pv-r3kh.json', 'utf8', (err, fd) => {
-              //           JSON.parse(fd).forEach(element => {
-              //             let SQL = `
-              //               INSERT INTO crime_reports(report_id, rms_cdw_id, general_offense_number, offense_code, offense_code_extension, offense_type, summary_offense_code, summarized_offense_description, date_reported, occurred_date_or_date_range_start, occurred_date_range_end, hundred_block_location, district_sector, zone_beat, census_tract_2000, longitude, latitude, location, month, year)
-              //               SELECT report_id, $1, $2, $3, $4, $,5 $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
-              //             ;`;
-              //             let values = [element.report_id, element.rms_cdw_id, element.general_offense_number, element.offense_code, element.offense_code_extension, element.offense_type, element.summary_offense_code, element.summarized_offense_description, element.date_reported, element.occurred_date_or_date_range_start, element.occurred_date_range_end, element.hundred_block_location, element.district_sector, element.zone_beat, element.census_tract_2000, element.longitude, element.latitude, element.location, element.month, element.year];
-              //             client.query( SQL, values )
-              //               .catch(console.error);
-              //           })
-              //         })
-              //       }
-              //     })
-              // }
-              
-              // function loadCrimeDB() {
-              //     //LOOK UP FLOATING TIMESTAMP
-              
-              //   client.query(`
-              //     CREATE TABLE IF NOT EXISTS
-              //     crime_reports (
-              //       report_id SERIAL PRIMARY KEY,
-              //       rms_cdw_id VARCHAR(30),
-              //       general_offense_number VARCHAR(30),
-              //       offense_code VARCHAR(10),
-              //       offense_code_extension VARCHAR(5),
-              //       offense_type VARCHAR(50),
-              //       summary_offense_code VARCHAR(10),
-              //       summarized_offense_description VARCHAR(50),
-              //       date_reported DATETIME(YYYY-MM-DD[ hh:mm:ss[.mmm]]),
-              //       occurred_date_or_date_range_start DATETIME(YYYY-MM-DD[ hh:mm:ss[.mmm]]),
-              //       occurred_date_range_end DATETIME(YYYY-MM-DD[ hh:mm:ss[.mmm]]),
-              //       hundred_block_location VARCHAR(50),
-              //       district_sector VARCHAR(5),
-              //       zone_beat VARCHAR(5),
-              //       census_tract_2000 VARCHAR(15),
-              //       longitude DOUBLE,
-              //       latitude DOUBLE,
-              //       location VARCHAR(100),
-              //       month INTEGER,
-              //       year INTEGER,
-              //     );`
-              //   )
-              //   //create new loadReports FUNCTION
-              //     .then(loadReports)
-              //     .catch(console.error);
-              // }
+//rms_cdw_id VARCHAR(30),
+//general_offense_number VARCHAR(30),
+//offense_code_extension VARCHAR(5),
+//offense_type VARCHAR(50),
+//summary_offense_code VARCHAR(10),
+//occurred_date_or_date_range_start TIMESTAMPTZ,
+//occurred_date_range_end TIMESTAMPTZ,
+//census_tract_2000 VARCHAR(15),
+//month INTEGER,
+//year INTEGER
+		
