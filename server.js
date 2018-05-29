@@ -1,10 +1,10 @@
 'use strict';
 
-const pg = require('pg');
-const fs = require('fs');
-const cors = require('cors');
-const express = require('express');
-const superagent = require('superagent');
+const pg = require( 'pg' );
+const fs = require( 'fs' );
+const cors = require( 'cors' );
+const express = require( 'express' );
+const superagent = require( 'superagent' );
 const conString = '';
 
 const app = express();
@@ -14,14 +14,14 @@ const CLIENT_URL = process.env.CLIENT_URL;
 
 const SOCRATA_KEY = process.env.SOCRATA_KEY;
 
-const client = new pg.Client('postgres://localhost:5432/safr');
+// const client = new pg.Client( 'postgres://localhost:5432/safr' );
+const client = new pg.Client( 'postgres://postgres:Sadie12!@@localhost:5432/safr' );
 client.connect();
 
-app.use(cors());
-app.use(express.urlencoded({extended:true}));
-// app.use(express.json());
+app.use( cors() );
+app.use( express.urlencoded( { extended: true } ) );
 
-app.get('/', (req, res) => res.send(`It's ALLLLIIIIVEEE!!`));
+app.get( '/', ( req, res ) => res.send( `It's ALIVE!` ) );
 
 loadDB();
 
@@ -45,8 +45,8 @@ app.get('/data/sea-gov', (req, res) => {
 });
 
 function loadDB() {
-		console.log('loadDB');
-    client.query(`
+  console.log( 'loadDB' );
+  client.query( `
     CREATE TABLE IF NOT EXISTS
     crime_reports (
       report_id SERIAL PRIMARY KEY,      
@@ -60,22 +60,21 @@ function loadDB() {
       latitude DOUBLE PRECISION,
       location VARCHAR(100)			
     );`
-    )
-    .then(console.log)
-    .catch(console.error);
+  )
+    .then( console.log )
+    .catch( console.error );
 }
 
-app.get('*', (request, response) => response.redirect(CLIENT_URL));
-app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
+app.get( '*', ( request, response ) => response.redirect( CLIENT_URL ) );
+app.listen( PORT, () => console.log( `Listening on port: ${ PORT }` ) );
 
-//rms_cdw_id VARCHAR(30),
-//general_offense_number VARCHAR(30),
-//offense_code_extension VARCHAR(5),
-//offense_type VARCHAR(50),
-//summary_offense_code VARCHAR(10),
-//occurred_date_or_date_range_start TIMESTAMPTZ,
-//occurred_date_range_end TIMESTAMPTZ,
-//census_tract_2000 VARCHAR(15),
-//month INTEGER,
-//year INTEGER
-		
+// rms_cdw_id VARCHAR(30),
+// general_offense_number VARCHAR(30),
+// offense_code_extension VARCHAR(5),
+// offense_type VARCHAR(50),
+// summary_offense_code VARCHAR(10),
+// occurred_date_or_date_range_start TIMESTAMPTZ,
+// occurred_date_range_end TIMESTAMPTZ,
+// census_tract_2000 VARCHAR(15),
+// month INTEGER,
+// year INTEGER
