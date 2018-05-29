@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 const CLIENT_URL = process.env.CLIENT_URL;
 // const TOKEN = process.env.TOKEN;
 
-const API_KEY = process.env.SOCRATA_KEY;
+const SOCRATA_KEY = process.env.SOCRATA_KEY;
 
 const client = new pg.Client('postgres://localhost:5432/safr');
 client.connect();
@@ -29,8 +29,8 @@ app.get('/data/sea-gov', (req, res) => {
     superagent
     .get('https://data.seattle.gov/resource/y7pv-r3kh.json')
         .query({
-            '$where': "(offense_code like '12%' or offense_code like '13%' or offense_code like '16%' or offense_code like '21%') and date_reported > '2018-02-01T12:00:00'",
-            '$$app_token': `${API_KEY}`
+            '$where': "(offense_code like '9%' or offense_code like '12%' or offense_code like '13%' or offense_code like '16%' or offense_code like '21%' or offense_code like '22%') and date_reported > '2018-02-01T12:00:00'",
+            '$$app_token': `${SOCRATA_KEY}`
 				})
         .then(response => {
 					response.body.forEach((e) => {
