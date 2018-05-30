@@ -14,8 +14,8 @@ const CLIENT_URL = process.env.CLIENT_URL;
 
 const SOCRATA_KEY = process.env.SOCRATA_KEY;
 
-const client = new pg.Client( 'postgres://localhost:5432/safr' );
-// const client = new pg.Client( 'postgres://postgres:Sadie12!@@localhost:5432/safr' );
+// const client = new pg.Client( 'postgres://localhost:5432/safr' );
+const client = new pg.Client( process.env.DATBASE_URL );
 client.connect();
 
 app.use( cors() );
