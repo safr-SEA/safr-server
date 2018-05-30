@@ -23,17 +23,17 @@ This was built using JavaScript, jQuery, PostgresQL, HTML, and CSS.  We also use
 * [Git Hub](https://github.com/karenbtlai)
 
 ### Justin Whitaker
-* @imaginarytrend
+* Twitter: @imaginarytrend
 * [Linked In](https://www.linkedin.com/in/justin-whitaker/)
 * [Git Hup](https://github.com/Trendswithbenefits)
 
 ### Jermaine Walker
-* @stateofjermaine
+* Twitter: @stateofjermaine
 * [Linked In](https://www.linkedin.com/in/jermainemwalker)
 * [Git Hub](https://github.com/stateofjermaine)
 
 ### Amy Cohen
-* @cohenamyv
+* Twitter: @cohenamyv
 * [Linked In](https://www.linkedin.com/in/amyvcohen/)
 * [Git Hub](https://github.com/AmyCohen)
 
