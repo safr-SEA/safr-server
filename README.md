@@ -3,7 +3,7 @@
 ## Description
 Our ultimate goal is to use crime and police response time data (data.seattle.gov API)  to allow people to discover places that are underserved by municipalities in terms of police response times. This allows the public to start a conversation about potential improvements and empowers residents and visitors to make informed decisions about their safety.
 
-To be able to stay within the time constraints of this final project, we are starting with loading the 911 calls that had officer responses and map those locations using Google Maps. This does not yet incluce the response time.
+To be able to stay within the time constraints of this final project, we are starting with loading the 911 calls that had officer responses and map those locations using Google Maps. This does not yet include the response time.
 
 ## Getting Started
 * Used the .eslintrc.json and the .gitignore from the class repo
