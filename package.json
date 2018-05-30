@@ -1,0 +1,34 @@
+{
+  "name": "safr-server",
+  "version": "1.0.0",
+  "description": "Server repo",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/safr-SEA/safr-server.git"
+  },
+  "keywords": [
+    "npm",
+    "node",
+    "safr",
+    "pg",
+    "express"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/safr-SEA/safr-server/issues"
+  },
+  "homepage": "https://github.com/safr-SEA/safr-server#readme",
+  "dependencies": {
+    "cors": "^2.8.4",
+    "express": "^4.16.3",
+    "fs": "0.0.1-security",
+    "pg": "^7.4.3",
+    "superagent": "^3.8.3"
+  }
+}
