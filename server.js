@@ -47,7 +47,15 @@ app.get('/data/sea-gov', (req, res) => {
 app.get('/data/sea-gov/latlng', (req, res) => {
 	
 	console.log(req.query.dataLatLng);
-	return res;
+	let dataLatLng = req.query.dataLatLng;
+	let dataLat = parseFloat(dataLatLng.lat);
+	let dataLng = parseFloat(dataLatLng.lng);
+
+	let SQL = `SELECT * FROM crime_reports WHERE (latitude BETWEEN ${dataLat - 0.003} AND ${dataLat + 0.003}) AND (longitude BETWEEN ${dataLng - 0.003} AND ${dataLng + 0.003});`;
+
+	client.query(SQL)
+		.then(result => res.send(result.rows))
+		.catch(console.error)
 
 });
 
