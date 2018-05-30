@@ -14,8 +14,8 @@ const CLIENT_URL = process.env.CLIENT_URL;
 
 const SOCRATA_KEY = process.env.SOCRATA_KEY;
 
-// const client = new pg.Client( 'postgres://localhost:5432/safr' );
-const client = new pg.Client( 'postgres://postgres:Sadie12!@@localhost:5432/safr' );
+const client = new pg.Client( 'postgres://localhost:5432/safr' );
+// const client = new pg.Client( 'postgres://postgres:Sadie12!@@localhost:5432/safr' );
 client.connect();
 
 app.use( cors() );
@@ -43,6 +43,15 @@ app.get('/data/sea-gov', (req, res) => {
 				})
         .catch(console.error);
 });
+
+app.get('/data/sea-gov/latlng', (req, res) => {
+	
+	console.log(req.query.dataLatLng);
+	return res;
+
+});
+
+// DATABASE LOADER
 
 function loadDB() {
   console.log( 'loadDB' );
