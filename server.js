@@ -60,7 +60,7 @@ app.get('/data/sea-gov/latlng', (req, res) => {
 });
 
 app.get('/data/sea-gov/latlngall', (req, res) => {
-  let SQL = `SELECT * FROM safr_sea_dedup_90_day`;
+  let SQL = `SELECT * FROM safr_sea_dedup_90_day;`;
   client.query(SQL)
     .then(result => res.send(result.rows))
     .catch(console.error)
