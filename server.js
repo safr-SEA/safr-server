@@ -23,7 +23,7 @@ app.use( express.urlencoded( { extended: true } ) );
 
 app.get( '/', ( req, res ) => res.send( `It's ALIVE!` ) );
 
-loadDB();
+// loadDB();
 
 // app.get('/data/sea-gov', (req, res) => {
 //     superagent
@@ -51,7 +51,7 @@ app.get('/data/sea-gov/latlng', (req, res) => {
 	let dataLat = parseFloat(dataLatLng.lat);
 	let dataLng = parseFloat(dataLatLng.lng);
 
-	let SQL = `SELECT * FROM safr_sea_dedup_90_day WHERE (latitude BETWEEN ${dataLat - 0.003} AND ${dataLat + 0.003}) AND (longitude BETWEEN ${dataLng - 0.003} AND ${dataLng + 0.003});`;
+	let SQL = `SELECT * FROM safr_sea_dedup_90_day WHERE (cast(latitude as double precision) BETWEEN ${dataLat - 0.003} AND ${dataLat + 0.003}) AND (cast(longitude as double precision) BETWEEN ${dataLng - 0.003} AND ${dataLng + 0.003});`;
 
 	client.query(SQL)
 		.then(result => res.send(result.rows))
