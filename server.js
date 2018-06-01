@@ -59,6 +59,13 @@ app.get('/data/sea-gov/latlng', (req, res) => {
 
 });
 
+app.get('/data/sea-gov/latlngall', (req, res) => {
+  let SQL = `SELECT * FROM crime_reports`;
+  client.query(SQL)
+    .then(result => res.send(result.rows))
+    .catch(console.error)
+});
+
 // DATABASE LOADER
 
 function loadDB() {
