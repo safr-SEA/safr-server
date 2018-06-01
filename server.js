@@ -26,7 +26,7 @@ app.get( '/', ( req, res ) => res.send( `It's ALIVE!` ) );
 loadDB();
 
 app.get('/data/sea-gov', (req, res) => {
-    superagent
+  superagent
     .get('https://data.seattle.gov/resource/y7pv-r3kh.json')
         .query({
             '$where': "(offense_code like '9%' or offense_code like '12%' or offense_code like '13%' or offense_code like '16%' or offense_code like '21%' or offense_code like '22%') and date_reported > '2018-02-01T12:00:00'",
@@ -42,6 +42,13 @@ app.get('/data/sea-gov', (req, res) => {
 					res.send(response.body);
 				})
         .catch(console.error);
+});
+
+app.get('/data/sea-gov/latlngall', (req, res) => {
+  let SQL = `SELECT * FROM crime_reports`;
+  client.query(SQL)
+    .then(result => res.send(result.rows))
+    .catch(console.error)
 });
 
 app.get('/data/sea-gov/latlng', (req, res) => {
@@ -84,14 +91,3 @@ function loadDB() {
 
 app.get( '*', ( request, response ) => response.redirect( CLIENT_URL ) );
 app.listen( PORT, () => console.log( `Listening on port: ${ PORT }` ) );
-
-// rms_cdw_id VARCHAR(30),
-// general_offense_number VARCHAR(30),
-// offense_code_extension VARCHAR(5),
-// offense_type VARCHAR(50),
-// summary_offense_code VARCHAR(10),
-// occurred_date_or_date_range_start TIMESTAMPTZ,
-// occurred_date_range_end TIMESTAMPTZ,
-// census_tract_2000 VARCHAR(15),
-// month INTEGER,
-// year INTEGER
